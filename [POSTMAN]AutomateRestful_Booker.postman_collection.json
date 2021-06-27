@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "4eafbf95-b52b-43f1-8396-7ad61f625ea2",
+		"name": "[POSTMAN]AutomateRestful_Booker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateBooking",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');\r",
+							"pm.environment.set('checkinDate',moment().format('YYYY-MM-DD'));\r",
+							"pm.environment.set(\"checkoutDate\", moment().add(10,'day').format('YYYY-MM-DD'));\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var firstname=pm.variables.get(\"firstname\");\r",
+							"var lastname=pm.variables.get(\"lastname\");\r",
+							"\r",
+							"pm.test(\"Contains firstname\" +firstname, function () {\r",
+							"    pm.expect(pm.response.text()).to.include(firstname);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Contains lastname\" +lastname, function () {\r",
+							"    pm.expect(pm.response.text()).to.include(lastname);\r",
+							"});\r",
+							"\r",
+							"var bookingid = pm.response.json().bookingid;\r",
+							"console.log(bookingid);\r",
+							"pm.environment.set(\"bookingid\", bookingid);\r",
+							"pm.environment.set(\"firstname\", firstname);\r",
+							"pm.environment.set(\"lastname\", lastname);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"{{firstname}}\",\n    \"lastname\" : \"{{lastname}}\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"{{checkinDate}}\",\n        \"checkout\" : \"{{checkoutDate}}\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/booking",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Booking - GetBooking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"var firstname = pm.environment.get(\"firstname\");\r",
+							"var lastname = pm.environment.get(\"lastname\");\r",
+							"\r",
+							"pm.test(\"check firstname\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.firstname).to.eql(firstname);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"check firstname\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.lastname).to.eql(lastname);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/booking/{{bookingid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking",
+						"{{bookingid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Booking - UpdateBooking",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "token=abc123"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\" : \"James\",\n    \"lastname\" : \"Brown\",\n    \"totalprice\" : 111,\n    \"depositpaid\" : true,\n    \"bookingdates\" : {\n        \"checkin\" : \"2018-01-01\",\n        \"checkout\" : \"2019-01-01\"\n    },\n    \"additionalneeds\" : \"Breakfast\"\n}"
+				},
+				"url": {
+					"raw": "{{rb_url}}/booking/1",
+					"host": [
+						"{{rb_url}}"
+					],
+					"path": [
+						"booking",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
